@@ -28,7 +28,6 @@ function AutoRotate.new(PhysicsCharacterController : PhysicsCharacterController)
     local alignOrientation = Instance.new("AlignOrientation")
     alignOrientation.Attachment0 = PhysicsCharacterController._CenterAttachment
     PhysicsCharacterController._CenterAttachment.Name = "CenterAttach"
-    PhysicsCharacterController._CenterAttachment.Visible = true
 
     self.AlignOrientation = alignOrientation
 
@@ -61,12 +60,11 @@ function AutoRotate:Update(PhysicsCharacterController : PhysicsCharacterControll
 end
 
 function AutoRotate:Destroy()
-    if self._AlignmentAttachment.Parent ~= nil then
-        self._AlignmentAttachment:Destroy()
-    end
-    if self.AlignOrientation:FindFirstAncestorWhichIsA("Workspace") ~= nil then
-        self.AlignOrientation:Destroy()
-    end
+
+    self._AlignmentAttachment:Destroy()
+    
+    self.AlignOrientation:Destroy()
+    
 end
 
 

@@ -1,0 +1,534 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBX180684B861A14F619962AB998533A45D">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<string name="Name">AnimIDs</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="NumberValue" referent="RBXCADC2B10FC024EF090D69BD2AFFC837D">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">ScaleDampeningPercent</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="Value">1</double>
+			</Properties>
+		</Item>
+		<Item class="StringValue" referent="RBX524972A9594648D3A1AEB99F921ABCD4">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">cheer</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX193551F1907448B0A69FDC581F15D095">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507770677</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">CheerAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXC79E000DD8844EE8906BAC789134D32F">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">climb</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXB478C850BBFC4B2EB635906BDD1E8F23">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507765644</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">ClimbAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX7DC4D6BE7F054F74ABB25974DE8ED40D">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">dance</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX94AD2A68ED13417EB4B3AF44C05C74BE">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507771019</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation1</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBXF74B33736ED84FFE87213F9C06BDEE9F">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Animation" referent="RBXE54D8199C1654282B424B3081B508D60">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507771955</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation2</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBX75BA38365CB846E3AF7E56C7863E3927">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Animation" referent="RBX146F6B177CFC40D880227124348F977E">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507772104</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation3</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBX919012AE3DA1424898547F6EF98F433B">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXC3EBE13631EA49B69BA24ED4366727A7">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">dance2</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXE087E0CED2524419826E24BB7447CEB9">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507776043</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation1</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBX4D5DFE2C1C9742839D6EA532B327350F">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Animation" referent="RBXFB1152772D03439FAE81444669786959">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507776720</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation2</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBXA2F790C7368D4F2AB801D2A0CEAFA83D">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Animation" referent="RBXAE7917DA9A1E4050A0C8D53CBFEB6B2B">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507776879</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation3</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBX38B89BCAA33942F38A9F279B9E0F147A">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXA86BAFF77F2847BA948A3CADABF47511">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">dance3</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX8C97AD16C7EE4AA1B077B0E5E10C7128">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507777268</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation1</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBX3A72B7CFFAC74F34B08D77A2D92BDD25">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Animation" referent="RBX34886B4A73B04915BA4B0011D37BC8C2">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507777451</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation2</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBX6175D704DAB84211B404A8AEC1D51A78">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Animation" referent="RBXC222C62D0ADF45C791533318FE47B3E6">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507777623</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation3</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBX7F708BFCA20C4DF6A678EC8E987511D0">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">10</double>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX1B50603CFE5548BBBEEB764509D01762">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">fall</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX433DF9D2F0C044759E42AB20DD5D3EB7">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507767968</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">FallAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX7AA0182E512841A8A3086B96F7A436A1">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">idle</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX613135051CDE4AA8AEA3A153BC28B333">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507766388</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation1</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBXD24C628BF5474D6B8442114D283CC5E7">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">9</double>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Animation" referent="RBX3F4305C18C9B4C4E93C0CF111B19C15C">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507766666</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Animation2</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="NumberValue" referent="RBXE007737DC8F74811B76977862FBBDEA1">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Weight</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="Value">1</double>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX2FD419B5ED404A589357D23F35D07E08">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">jump</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXA2F698718C754426B35A044050532048">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507765000</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">JumpAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXB8FF9ED374C2451EB8B513A041331DCB">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">laugh</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX56C4C323F934499AB06AF1D9758E7BD5">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507770818</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">LaughAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX026C2C14B9054BCE9633FA907C33C7FB">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">point</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXEDB19E04E7A64B578750D4042B2C0061">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507770453</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">PointAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX8B8DC74FF8664EE5A59C25F62B46E72E">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">run</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX18EB10D43FAA42F18D6CC5CA0450AD27">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=913376220</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">RunAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXC0E1D089C2FA47DABFA6FA0BB07262F6">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">sit</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXBDD7697561C149EABAD3A147A36D58E4">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=2506281703</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">SitAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXA2C8DB3C9B274DB59F6F858104927115">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">swim</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXCA07EC6364084140B05192F23ECD1862">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=913384386</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Swim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX99E7F050F2DA49CC9B0339BF876C8542">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">swimidle</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX368830A673C7474782E15BF6A02098E3">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=913389285</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">SwimIdle</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX56E694791CC840BDA99A9787DAFE984A">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">toollunge</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXECF7FEC858FD4BAC9E9B2A1FC6023F90">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=522638767</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">ToolLungeAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBX07D4566CC2E24EC4855C411B8AFEC544">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">toolnone</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBXB2776A6BC22542CFA20C91FF44ED1B14">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507768375</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">ToolNoneAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXAF4A674C7B9A43239153FC3F032A9F7F">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">toolslash</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX5D65E47E7F4540ABAAF68ADE7594E645">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=522635514</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">ToolSlashAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXE3A308C121944FC798AD5C4F347EAAAA">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">walk</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX0C35A7BE1C7C4E7B8B172E2E7B99467F">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=913402848</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">WalkAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="StringValue" referent="RBXDAF78D721E604EE19B65BD27094B2C43">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">wave</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<string name="Value"></string>
+			</Properties>
+			<Item class="Animation" referent="RBX451B3B3AB29C477CB41ECEBE60A499E7">
+				<Properties>
+					<Content name="AnimationId"><url>http://www.roblox.com/asset/?id=507770239</url></Content>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">WaveAnim</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="BindableFunction" referent="RBX4800620F2F4F4515ABCEED14462F640A">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">PlayEmote</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>

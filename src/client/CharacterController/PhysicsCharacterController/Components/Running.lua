@@ -94,7 +94,11 @@ function Running:Update(data : PhysicsCharacterController)
 end
 
 function Running:Destroy()
+
+    self.DragForce:Destroy()
     
+    self.MovementForce:Destroy()
+
 end
 
 

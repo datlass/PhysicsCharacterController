@@ -1,3 +1,7 @@
+--[[
+    Handles vectorforces to keep the rootPart standing
+]]
+
 export type PhysicsCharacterController = {
     RootPart : BasePart, --Rootpart
     _Model : Model,
@@ -53,7 +57,6 @@ function HipHeight.new(data : PhysicsCharacterController)
             local vectorForce = setupVectorForceRelativeToWorld(attachment, rootPart, true)
             table.insert(attachments, attachment)
             table.insert(vectorForces, vectorForce)
-            attachment.Visible = true
         end
     end
     local model = data._Model
@@ -129,6 +132,14 @@ function HipHeight:Update(data : PhysicsCharacterController)
 end
 
 function HipHeight:Destroy()
+
+    for i,v in pairs(self.VectorForces) do
+        v:Destroy()
+    end
+
+    for i,v in pairs(self.Attachments) do
+        v:Destroy()
+    end
 
 end
 

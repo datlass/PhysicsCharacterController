@@ -1,5 +1,5 @@
 --[[
-    Class that contains movement components
+    Class that handles movement components
     Mostly used for storing data required such as root part and model
     Also can handle input
 ]]
@@ -11,7 +11,7 @@ local ZERO_VECTOR = Vector3.zero
 
 local MOVEMENT_COMPONENTS = script.Components:GetChildren()
 
-local Signal = require(script.Parent.Signal)
+local Signal = require(script.Signal)
 
 export type PhysicsCharacterController = {
     RootPart : BasePart, --Rootpart
@@ -47,13 +47,17 @@ function PhysicsCharacterController.new(rootPart : BasePart, humanoid : Humanoid
     } 
 
     local StateSignal = {}
+
     for _, event in pairs(charEvents) do
         local signal = Signal.new()
         local state = event.to
         StateSignal[state] = signal
     end
+
     self._StateSignals = StateSignal
+
     local charCallbacks = {}
+
     for state : string, signal in pairs(StateSignal) do
         charCallbacks["on_"..state] = function(self, event, from, to)
             if state == "Running" then
@@ -71,12 +75,14 @@ function PhysicsCharacterController.new(rootPart : BasePart, humanoid : Humanoid
 		callbacks = charCallbacks
 	})
 
+    self._RunLoop = true
     task.spawn(function()
-        while model.Parent ~= nil do
+        while model.Parent ~= nil and self._RunLoop do
             if  self._StateMachine.current == "Running" then
                 local speedVector = rootPart.AssemblyLinearVelocity*XZ_VECTOR
                 StateSignal.Running:Fire(speedVector.Magnitude)
             end
+            
             RunService.Heartbeat:Wait()
         end
     end)
@@ -106,19 +112,19 @@ function PhysicsCharacterController:AddComponent(componentModule : ModuleScript)
 
 end
 
-function PhysicsCharacterController:AddDefaultComponents()
-    for i, module in pairs(MOVEMENT_COMPONENTS) do
-        
-        self:AddComponent(module)
-    end
-end
-
 function PhysicsCharacterController:RemoveComponent(componentModule)
 
     local existingComponent = self._MovementComponents[componentModule]
     existingComponent:Destroy()
     self._MovementComponents[componentModule] = nil
 
+end
+
+function PhysicsCharacterController:AddDefaultComponents()
+    for i, module in pairs(MOVEMENT_COMPONENTS) do
+        
+        self:AddComponent(module)
+    end
 end
 
 function PhysicsCharacterController:Update(moveDirection : Vector3, deltaTime)
@@ -150,23 +156,36 @@ function PhysicsCharacterController:InitUpdateDefaultControls()
     local connection
     connection = RunService.Stepped:Connect(function(time, deltaTime)
         if self._Model.Parent == nil then
+            --Automatic clean up upon character respawn
             connection:Disconnect()
         end
         self:Update(humanoid.MoveDirection, deltaTime)
     end)
 
-    local jumpObject = self._MovementComponents[script.Components.Jump]
+    --For jump use JumpRequest
+    local jumpModuleScript : ModuleScript = script.Components.Jump
+    local jumpObject = self._MovementComponents[jumpModuleScript]
     local jumpConnection 
     jumpConnection = UserInputService.JumpRequest:Connect(function()
         if self._Model.Parent == nil then
-            connection:Disconnect()
+            --Automatic clean up upon character respawn
+            jumpConnection:Disconnect()
         end
         jumpObject:InputBegan()
     end)
 end
 
+--To do add
 function PhysicsCharacterController:Destroy()
+    for i, componentObject in pairs(self._MovementComponents) do
+        componentObject:Destroy()
+    end
+    self._CenterAttachment:Destroy()
+    self._RunLoop = false
     
+    for state : string, signal in pairs(self._StateSignals) do
+        signal:DisconnectAll()
+    end
 end
 
 

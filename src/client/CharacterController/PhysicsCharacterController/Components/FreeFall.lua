@@ -1,3 +1,8 @@
+--[[
+    Only handles change to freefalling state
+    After animation debounce of default 0.31 seconds, and negative y velocity
+]]
+
 export type PhysicsCharacterController = {
     RootPart : BasePart, --Rootpart
     _Model : Model,
@@ -27,9 +32,6 @@ local jumpModule = script.Parent.Jump
 
 function FreeFall:Update(data : PhysicsCharacterController, deltaTime)
 
-    -- local hipHeightObject = data._MovementComponents[hipHeightModule]
-    -- assert(hipHeightObject, "Running Component requires HipHeight Component make sure the :Add(HipHeightModuleScript) on Physics Character Controller")
-    -- local onGround = hipHeightObject.OnGround
     local stateMachine = data._StateMachine
 
     local xzSpeed = data._XZ_Speed
@@ -37,8 +39,6 @@ function FreeFall:Update(data : PhysicsCharacterController, deltaTime)
     local rootVelocity = data.Velocity
     local moveDirection = data.MoveDirection
     local unitXZ = data._RootPartUnitXZVelocity
-
-
 
     local model = data._Model
 

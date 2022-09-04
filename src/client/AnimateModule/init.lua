@@ -1,4 +1,9 @@
 --Default animate script taken from character character
+local folder = script.AnimateChildrenFolder:GetChildren()
+
+for i,v in pairs(folder) do
+    v.Parent = script
+end
 
 local function animate(char, characterController)
     local findExistingAnimationInSet
@@ -522,7 +527,7 @@ local function animate(char, characterController)
                 local runAnimName = "run"
                 local runIdx = rollAnimation(runAnimName)
     
-                runAnimTrack = humanoid:LoadAnimation(animTable[runAnimName][runIdx].anim)
+                runAnimTrack = humanoid:WaitForChild"Animator":LoadAnimation(animTable[runAnimName][runIdx].anim)
                 runAnimTrack.Priority = Enum.AnimationPriority.Core
                 runAnimTrack:Play(transitionTime)		
                 
@@ -616,7 +621,7 @@ local function animate(char, characterController)
             userEmoteToRunThresholdChange and currentlyPlayingEmote and Humanoid.MoveDirection == Vector3.new(0, 0, 0)
         local speedThreshold = movedDuringEmote and Humanoid.WalkSpeed or 0.75
         if speed > speedThreshold then
-            local scale = 16.0
+            local scale = char:GetAttribute("WalkSpeed") or 16.0
             playAnimation("walk", 0.2, Humanoid)
             setAnimationSpeed(speed / scale)
             pose = "Running"
@@ -778,12 +783,14 @@ local function animate(char, characterController)
     Humanoid.Swimming:connect(onSwimming)
     --Hook up 
     local stateSignals = characterController._StateSignals
-    stateSignals.Running:Connect(onRunning)
-    stateSignals.Jumping:Connect(onJumping)
-    stateSignals.FreeFalling:Connect(onFreeFall)
+    local connection1 = stateSignals.Running:Connect(onRunning)
+    local connection2 = stateSignals.Jumping:Connect(onJumping)
+    local connection3 = stateSignals.FreeFalling:Connect(onFreeFall)
+    local connections = {connection1, connection2, connection3}
     local stateMachine = characterController._StateMachine
     stateMachine.on_land = function()
         pose = "Running"
+        onRunning(0) --Reset to standing idle animation
     end
     -- setup emote chat hook
     game:GetService("Players").LocalPlayer.Chatted:connect(function(msg)
@@ -836,13 +843,20 @@ local function animate(char, characterController)
         pose = "Standing"
     end
     
-    -- loop to handle timed state transitions and tool animations
+    local offset = os.time() - tick()
+    local function GetTime()
+        return tick() + offset
+    end
+        -- loop to handle timed state transitions and tool animations
     while Character.Parent ~= nil do
-        local _, currentGameTime = wait(0.1)
+        local _ = task.wait(0.1)
+        local currentGameTime = GetTime()
         stepAnimate(currentGameTime)
     end
     
-    
+    for i, v in pairs(connections) do
+        v:Disconnect()
+    end
 end
 
 return animate
