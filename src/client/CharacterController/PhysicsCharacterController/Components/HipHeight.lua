@@ -44,7 +44,7 @@ function HipHeight.new(data : PhysicsCharacterController)
     local vectorForces = {}
     self.VectorForces = vectorForces
     self.Attachments = attachments
-    
+    self._vectorSpringDragForce = setupVectorForceRelativeToWorld(data._CenterAttachment, rootPart, true)
     self.OnGround = true
 
     --0,1,2,3,4,5
@@ -61,7 +61,7 @@ function HipHeight.new(data : PhysicsCharacterController)
     end
     local model = data._Model
 
-    model:SetAttribute("Suspension", 7500 / #vectorForces)
+    model:SetAttribute("Suspension", 21000)
     model:SetAttribute("Bounce", 200)
 
     local humanoid = model:FindFirstChild("Humanoid")
@@ -98,21 +98,21 @@ function HipHeight:Update(data : PhysicsCharacterController)
     local hipHeight = model:GetAttribute("HipHeight") or 2.5
 
     local onGround = false
-    for _, v : VectorForce in pairs(self.VectorForces) do
+    local vectorForces = self.VectorForces
+    local totalSuspensionValue = model:GetAttribute("Suspension")
+    
+    local indivudalSuspension = totalSuspensionValue / #vectorForces
+
+    for _, v : VectorForce in pairs(vectorForces) do
         local attachment = v.Attachment0
         local raycastResult = workspace:Raycast(attachment.WorldPosition, DOWN_VECTOR*hipHeight, self.RayParams)
         if raycastResult then
-            local bounce = model:GetAttribute("Bounce")
     
             local currentSpringLength = (raycastResult.Position - rootPart.Position).Magnitude
-            local suspension = model:GetAttribute("Suspension")
             
-            local suspensionForceFactor = rootPart.AssemblyMass*suspension
-            --Taken from X_O Jeep, works great
-            local damping = suspensionForceFactor/bounce
-    
+            local suspensionForceFactor = rootPart.AssemblyMass*indivudalSuspension
+            --Taken from X_O Jeep, works great    
             local standupForce = Vector3.new(0, ((hipHeight - currentSpringLength)^2) * (suspensionForceFactor / hipHeight^2), 0)
-            standupForce  -= Vector3.new(0,rootPart.AssemblyLinearVelocity.Y*damping,0)
     
             v.Force = standupForce
             v.Force += self.MassPerForce*raycastResult.Normal
@@ -124,14 +124,25 @@ function HipHeight:Update(data : PhysicsCharacterController)
     end
 
     self.OnGround = onGround
+    local bounce = model:GetAttribute("Bounce")
+    if onGround then
+        local suspensionForceFactor = rootPart.AssemblyMass*totalSuspensionValue
+        --Taken from X_O Jeep, works great
+        local damping = suspensionForceFactor/bounce
+        -- F = - cV 
+        self._vectorSpringDragForce.Force  = Vector3.new(0,-rootPart.AssemblyLinearVelocity.Y*damping,0)
+    else
+        self._vectorSpringDragForce.Force  = ZERO_VECTOR
+    end
 
     if onGround and stateMachine.current == "FreeFalling" then
-        stateMachine.land()
-        stateMachine.recover()
+        stateMachine.land() --Transition from landed
+        stateMachine.recover() --Transition from landed to standing state
     end
 end
 
 function HipHeight:Destroy()
+    self._SpringDragForce:Destroy()
 
     for i,v in pairs(self.VectorForces) do
         v:Destroy()
