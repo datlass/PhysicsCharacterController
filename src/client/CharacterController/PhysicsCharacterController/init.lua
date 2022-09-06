@@ -55,7 +55,9 @@ local fsm = require(script.fsm)
 local XZ_VECTOR = Vector3.new(1,0,1)
 local ZERO_VECTOR = Vector3.zero
 
-local MOVEMENT_COMPONENTS = script.Components:GetChildren()
+local COMPONENTS_FOLDER : Folder = script.Components
+local CORE_COMPONENTS_FOLDER : Folder = COMPONENTS_FOLDER.CoreComponents
+local MOVEMENT_COMPONENTS_ARRAY = CORE_COMPONENTS_FOLDER:GetChildren()
 
 local Signal = require(script.Signal)
 
@@ -167,7 +169,7 @@ function PhysicsCharacterController:RemoveComponent(componentModule)
 end
 
 function PhysicsCharacterController:AddDefaultComponents()
-    for i, module in pairs(MOVEMENT_COMPONENTS) do
+    for i, module in pairs(MOVEMENT_COMPONENTS_ARRAY) do
         
         self:AddComponent(module)
     end
@@ -209,7 +211,7 @@ function PhysicsCharacterController:InitUpdateDefaultControls()
     end)
 
     --For jump use JumpRequest
-    local jumpModuleScript : ModuleScript = script.Components.Jump
+    local jumpModuleScript : ModuleScript = CORE_COMPONENTS_FOLDER.Jump
     local jumpObject = self._MovementComponents[jumpModuleScript]
     local jumpConnection 
     jumpConnection = UserInputService.JumpRequest:Connect(function()

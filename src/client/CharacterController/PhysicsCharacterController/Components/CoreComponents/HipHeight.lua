@@ -36,7 +36,7 @@ function HipHeight.new(data : PhysicsCharacterController)
     --corners based on birds eye view, assumes hrp is (0,0,0)
     local topRightCorner = rootPart.Size*Vector3.new(1,0,1)/2
 
-    local divisions = 2
+    local divisions = 3
     local xDivisionSize = 2*topRightCorner.X/divisions
     local zDivisionSize = 2*topRightCorner.Z/divisions
 
