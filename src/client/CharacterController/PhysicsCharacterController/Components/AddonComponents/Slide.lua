@@ -58,7 +58,9 @@ function Slide:InputBegan()
         model:SetAttribute("WalkSpeed", 0)
 
         -- model:SetAttribute("Suspension", 26000)
-        model:SetAttribute("Bounce", 200)
+        model:SetAttribute("Bounce", 50) --Reduce drag allowing velocity to go upwards
+        model:SetAttribute("FlatFriction", 2500) --Increase friction for faster accel but less distance
+
         -- local waist = model:FindFirstChild("Root", true)
         -- if waist then
         --     self._C0_ORIGINAL = waist.C0
@@ -87,7 +89,10 @@ function Slide:InputEnd()
 
     end
     -- model:SetAttribute("Suspension", 21000)
+    --Reset back to original
     model:SetAttribute("Bounce", 25)
+    model:SetAttribute("FlatFriction", 500) --Increase friction for faster accel but less distance
+
     -- local waist = model:FindFirstChild("Root", true)
     -- if waist then
     --     print(waist)

@@ -111,9 +111,11 @@ function HipHeight:Update(data : PhysicsCharacterController)
             local currentSpringLength = (raycastResult.Position - rootPart.Position).Magnitude
             
             local suspensionForceFactor = rootPart.AssemblyMass*indivudalSuspension
-            --Taken from X_O Jeep, works great    
+            --Taken from X_O Jeep, a bit too bouncy spring  
+            --(hipHeight - currentSpringLength)^2) * (suspensionForceFactor / hipHeight^2)  
             --(suspensionForceFactor / hipHeight^2)
             local extension = hipHeight - currentSpringLength
+            --Currently uses F = k * dx spring, k = spring constant, dx = extension
             local standupForce = Vector3.new(0, (suspensionForceFactor*(extension)), 0)
     
             v.Force = standupForce
