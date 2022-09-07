@@ -28,8 +28,6 @@ function FreeFall.new(data : PhysicsCharacterController)
     return self
 end
 
-local jumpModule = script.Parent.Jump
-
 function FreeFall:Update(data : PhysicsCharacterController, deltaTime)
 
     local stateMachine = data._StateMachine
@@ -42,7 +40,7 @@ function FreeFall:Update(data : PhysicsCharacterController, deltaTime)
 
     local model = data._Model
 
-    local jumpObject = data._MovementComponents[jumpModule]
+    local jumpObject = data:GetComponent("Jump")
     assert(jumpObject, "Jump component must be added")
     jumpObject.JumpAnimTransitionTime -= deltaTime
 

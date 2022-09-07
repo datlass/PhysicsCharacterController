@@ -49,11 +49,9 @@ function Running.new(data : PhysicsCharacterController)
     return self
 end
 
-local hipHeightModule = script.Parent.HipHeight
-
 function Running:Update(data : PhysicsCharacterController)
 
-    local hipHeightObject = data._MovementComponents[hipHeightModule]
+    local hipHeightObject = data:GetComponent("HipHeight")
     assert(hipHeightObject, "Running Component requires HipHeight Component make sure the :Add(HipHeightModuleScript) on Physics Character Controller")
     local onGround = hipHeightObject.OnGround
 
@@ -66,21 +64,43 @@ function Running:Update(data : PhysicsCharacterController)
     local model = data._Model
     local dragForce = self.DragForce
 
-    local movementForceScalar = (model:GetAttribute("WalkSpeed")^2)*model:GetAttribute("XZDragFactorVSquared") + model:GetAttribute("FlatFriction")
+    local isMoving = unitXZ.X == unitXZ.X -- NaN check
+
+    local totalDragForce = ZERO_VECTOR
+
+    local flatFrictionScalar
+    if onGround and isMoving then
+        --This equations allows vector forces to stabilize
+        --"Decrease flat friction when low speed"
+        --Constant friction when above velocity is above 2 usually
+        flatFrictionScalar = model:GetAttribute("FlatFriction")*(1.0-math.exp(-2*xzSpeed))
+        totalDragForce += -unitXZ*flatFrictionScalar
+    end
+
+    local walkSpeed = model:GetAttribute("WalkSpeed")
+
+    local dragCoefficient = model:GetAttribute("XZDragFactorVSquared")
+    local counterActGroundFriction = flatFrictionScalar or model:GetAttribute("FlatFriction")
+    local counterActDragFriction = (walkSpeed^2)*dragCoefficient
+
+    --If no drag friction, then no counter ground friction to prevent movement
+    if counterActDragFriction <= 0.01 then
+        counterActGroundFriction = 0
+    end
+
+    local movementForceScalar = counterActDragFriction + counterActGroundFriction
     self.MovementForce.Force = moveDirection*movementForceScalar
 
-    local isMoving = unitXZ.X == unitXZ.X
     if isMoving then
         local netDragForce = -unitXZ*(xzSpeed^2)*model:GetAttribute("XZDragFactorVSquared")
-		dragForce.Force = netDragForce
-	else
-		dragForce.Force = ZERO_VECTOR
+		totalDragForce += netDragForce
 	end
 
-    if onGround and isMoving then
-        local flatFrictionScalar = model:GetAttribute("FlatFriction")*(1.0-math.exp(-xzSpeed))
-        dragForce.Force += -unitXZ*flatFrictionScalar
-    end
+    -- print("Speed: ",math.round(xzSpeed*100)/100)
+    -- print("Drag force: ", math.round(totalDragForce.Magnitude*100)/100)
+    -- print("Movement Force: ", math.round(self.MovementForce.Force.Magnitude*100)/100)
+
+    dragForce.Force = totalDragForce
 
     --handle state
     local stateMachine = data._StateMachine

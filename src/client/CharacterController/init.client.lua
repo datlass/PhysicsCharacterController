@@ -19,7 +19,11 @@ local initChar = function(newCharacter : Model)
 
 	local characterController = PhysicsCharacterController.new(rootPart)
 	characterController:AddDefaultComponents()
-	characterController:InitUpdateDefaultControls()
+	characterController:AddComponent("Slide")
+	-- characterController:AddComponent("AirStrafe") --Component is WIP
+
+	characterController:Run()
+	characterController:ConnectComponentsToInput()
 	task.spawn(AnimateFunction, newCharacter, characterController)
 end
 

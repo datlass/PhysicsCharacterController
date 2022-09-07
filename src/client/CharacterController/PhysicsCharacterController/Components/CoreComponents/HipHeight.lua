@@ -61,8 +61,8 @@ function HipHeight.new(data : PhysicsCharacterController)
     end
     local model = data._Model
 
-    model:SetAttribute("Suspension", 21000)
-    model:SetAttribute("Bounce", 200)
+    model:SetAttribute("Suspension", 1000)
+    model:SetAttribute("Bounce", 25)
 
     local humanoid = model:FindFirstChild("Humanoid")
     if humanoid then
@@ -112,7 +112,9 @@ function HipHeight:Update(data : PhysicsCharacterController)
             
             local suspensionForceFactor = rootPart.AssemblyMass*indivudalSuspension
             --Taken from X_O Jeep, works great    
-            local standupForce = Vector3.new(0, ((hipHeight - currentSpringLength)^2) * (suspensionForceFactor / hipHeight^2), 0)
+            --(suspensionForceFactor / hipHeight^2)
+            local extension = hipHeight - currentSpringLength
+            local standupForce = Vector3.new(0, (suspensionForceFactor*(extension)), 0)
     
             v.Force = standupForce
             v.Force += self.MassPerForce*raycastResult.Normal

@@ -23,6 +23,10 @@ function Jump.new(data : PhysicsCharacterController)
 
     self._JumpDebounce = false
     self.JumpAnimTransitionTime = 0
+
+    --Uses UIS jump request
+    self.UseJumpRequest = true
+
     return self
 end
 
@@ -33,7 +37,7 @@ local hipHeightModule = script.Parent.HipHeight
 function Jump:InputBegan()
     local data = self.PhysicsCharacterController
     local stateMachine = data._StateMachine
-    local hipHeightObject = data._MovementComponents[hipHeightModule]
+    local hipHeightObject = data:GetComponent("HipHeight")
     assert(hipHeightObject, "Running Component requires HipHeight Component make sure the :Add(HipHeightModuleScript) on Physics Character Controller")
 
     local onGround = hipHeightObject.OnGround

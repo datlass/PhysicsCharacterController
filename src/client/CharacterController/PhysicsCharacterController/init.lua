@@ -49,6 +49,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
 ]]
+local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local fsm = require(script.fsm)
@@ -153,10 +154,18 @@ function PhysicsCharacterController.new(rootPart : BasePart, humanoid : Humanoid
     return self
 end
 
-function PhysicsCharacterController:AddComponent(componentModule : ModuleScript)
+function PhysicsCharacterController:AddComponent(componentModule : ModuleScript?)
+    if typeof(componentModule) == "string" then
+        componentModule = script:FindFirstChild(componentModule, true) or componentModule
+        assert(componentModule, "Component module cannot be found! Please check Components folder")
+    end
     local componentInitializer = require(componentModule)
+
     local component = componentInitializer.new(self)
-    self._MovementComponents[componentModule] = component
+    component.Name = componentModule.Name
+    component.ShouldUpdate = true
+
+    self._MovementComponents[componentModule.Name] = component
 
 end
 
@@ -166,6 +175,10 @@ function PhysicsCharacterController:RemoveComponent(componentModule)
     existingComponent:Destroy()
     self._MovementComponents[componentModule] = nil
 
+end
+
+function PhysicsCharacterController:GetComponent(nameOfComponentModule)
+    return self._MovementComponents[nameOfComponentModule]
 end
 
 function PhysicsCharacterController:AddDefaultComponents()
@@ -189,51 +202,83 @@ function PhysicsCharacterController:Update(moveDirection : Vector3, deltaTime)
     self.MoveDirection = moveDirection
 
     for i, component in pairs(self._MovementComponents) do
-        if component.Update then
+        if component.Update and component.ShouldUpdate then
             component:Update(self, deltaTime)
         end
     end
 
 end
 
-function PhysicsCharacterController:InitUpdateDefaultControls()
+function PhysicsCharacterController:Run()
     local PlayerModule = require(game.Players.LocalPlayer.PlayerScripts.PlayerModule)
     local Controls = PlayerModule:GetControls()
     local humanoid = self._Model:FindFirstChild("Humanoid")
 
     local connection
+    local camera = workspace.CurrentCamera
+
     connection = RunService.Stepped:Connect(function(time, deltaTime)
         if self._Model.Parent == nil then
             --Automatic clean up upon character respawn
             connection:Disconnect()
         end
-        self:Update(humanoid.MoveDirection, deltaTime)
-    end)
-
-    --For jump use JumpRequest
-    local jumpModuleScript : ModuleScript = CORE_COMPONENTS_FOLDER.Jump
-    local jumpObject = self._MovementComponents[jumpModuleScript]
-    local jumpConnection 
-    jumpConnection = UserInputService.JumpRequest:Connect(function()
-        if self._Model.Parent == nil then
-            --Automatic clean up upon character respawn
-            jumpConnection:Disconnect()
+        local vector = Controls:GetMoveVector()
+        local movementMagnitude = math.clamp(vector.Magnitude, 0, 1)
+        local moveDirection = camera.CFrame:VectorToWorldSpace(vector)*Vector3.new(1,0,1)
+        if moveDirection.Magnitude > 0.01 then
+            moveDirection = moveDirection.Unit
         end
-        jumpObject:InputBegan()
+        self:Update(moveDirection*movementMagnitude, deltaTime)
     end)
+end
+
+function PhysicsCharacterController:ConnectComponentsToInput()
+    local movementComponents = self._MovementComponents
+
+    for _, componentObject in pairs(movementComponents) do
+        if componentObject.UseJumpRequest then
+            local jumpConnection 
+            jumpConnection = UserInputService.JumpRequest:Connect(function()
+                if self._Model.Parent == nil then
+                    --Automatic clean up upon character respawn
+                    jumpConnection:Disconnect()
+                end
+                componentObject:InputBegan()
+            end)        
+        end
+
+        if componentObject.KeyCodes then
+            local testFunction = function(actionName, inputState, inputObject)
+                if inputState == Enum.UserInputState.Begin then
+                    componentObject:InputBegan()
+                end
+                if inputState == Enum.UserInputState.End or inputState == Enum.UserInputState.Cancel then
+                    componentObject:InputEnd()
+                end
+
+                return Enum.ContextActionResult.Sink
+            end
+            ContextActionService:BindAction(componentObject.Name, testFunction, true, table.unpack(componentObject.KeyCodes))
+        end
+
+    end
 end
 
 --To do add
 function PhysicsCharacterController:Destroy()
+
     for i, componentObject in pairs(self._MovementComponents) do
         componentObject:Destroy()
     end
+
     self._CenterAttachment:Destroy()
+
     self._RunLoop = false
     
     for state : string, signal in pairs(self._StateSignals) do
         signal:DisconnectAll()
     end
+
 end
 
 
