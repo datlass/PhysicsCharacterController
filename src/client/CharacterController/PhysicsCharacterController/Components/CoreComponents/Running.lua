@@ -24,8 +24,6 @@ function Running.new(data : PhysicsCharacterController)
     model:SetAttribute("XZDragFactorVSquared", XZ_DRAG_NUMBER)
     model:SetAttribute("FlatFriction", 500)
     model:SetAttribute("WalkSpeed", 16)
-    model:SetAttribute("EnableAirStrafe", false)
-    model:SetAttribute("DisableMovement", false)
 
 
     local attachment = data._CenterAttachment
