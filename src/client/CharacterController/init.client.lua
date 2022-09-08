@@ -18,13 +18,16 @@ local initChar = function(newCharacter : Model)
 	until newCharacter.Parent == workspace
 
 	local characterController = PhysicsCharacterController.new(rootPart)
-	characterController:AddDefaultComponents()
+	characterController:AddCoreComponents()
 	characterController:AddComponent("Slide")
 	-- characterController:AddComponent("AirStrafe") --Component is WIP
 
 	characterController:Run()
 	characterController:ConnectComponentsToInput()
 	task.spawn(AnimateFunction, newCharacter, characterController)
+	local animateScript = newCharacter:WaitForChild("Animate")
+	animateScript:Destroy()
+	print("Destroy animate script")
 end
 
 player.CharacterAdded:Connect(initChar)

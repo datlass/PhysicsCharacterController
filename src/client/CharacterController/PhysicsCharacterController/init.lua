@@ -58,7 +58,7 @@ local ZERO_VECTOR = Vector3.zero
 
 local COMPONENTS_FOLDER : Folder = script.Components
 local CORE_COMPONENTS_FOLDER : Folder = COMPONENTS_FOLDER.CoreComponents
-local MOVEMENT_COMPONENTS_ARRAY = CORE_COMPONENTS_FOLDER:GetChildren()
+local CORE_MOVEMENT_COMPONENTS_ARRAY = CORE_COMPONENTS_FOLDER:GetChildren()
 
 local Signal = require(script.Signal)
 
@@ -154,11 +154,16 @@ function PhysicsCharacterController.new(rootPart : BasePart, humanoid : Humanoid
     return self
 end
 
-function PhysicsCharacterController:AddComponent(componentModule : ModuleScript?)
-    if typeof(componentModule) == "string" then
-        componentModule = script:FindFirstChild(componentModule, true) or componentModule
+function PhysicsCharacterController:AddComponent(componentModuleOrString : ModuleScript?)
+    local componentModule : ModuleScript
+    if typeof(componentModuleOrString) == "string" then
+        componentModule = script:FindFirstChild(componentModuleOrString, true)
         assert(componentModule, "Component module cannot be found! Please check Components folder")
     end
+    if typeof(componentModuleOrString) == "Instance" then
+        componentModule = componentModuleOrString
+    end
+
     local componentInitializer = require(componentModule)
 
     local component = componentInitializer.new(self)
@@ -169,11 +174,11 @@ function PhysicsCharacterController:AddComponent(componentModule : ModuleScript?
 
 end
 
-function PhysicsCharacterController:RemoveComponent(componentModule)
+function PhysicsCharacterController:RemoveComponent(componentName : string)
 
-    local existingComponent = self._MovementComponents[componentModule]
+    local existingComponent = self._MovementComponents[componentName]
     existingComponent:Destroy()
-    self._MovementComponents[componentModule] = nil
+    self._MovementComponents[componentName] = nil
 
 end
 
@@ -181,10 +186,10 @@ function PhysicsCharacterController:GetComponent(nameOfComponentModule)
     return self._MovementComponents[nameOfComponentModule]
 end
 
-function PhysicsCharacterController:AddDefaultComponents()
-    for i, module in pairs(MOVEMENT_COMPONENTS_ARRAY) do
-        
-        self:AddComponent(module)
+function PhysicsCharacterController:AddCoreComponents()
+    for name, movementComponentObject in pairs(CORE_MOVEMENT_COMPONENTS_ARRAY) do
+
+        self:AddComponent(movementComponentObject)
     end
 end
 

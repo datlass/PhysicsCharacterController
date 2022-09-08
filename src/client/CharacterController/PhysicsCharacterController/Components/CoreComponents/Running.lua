@@ -62,7 +62,7 @@ function Running:Update(data : PhysicsCharacterController)
     local model = data._Model
     local dragForce = self.DragForce
 
-    local isMoving = unitXZ.X == unitXZ.X -- NaN check
+    local isMoving = unitXZ.X == unitXZ.X and xzSpeed > 0.001 -- NaN check also speed check to avoid very slow speed numbers into formula 1e-19 and such
 
     local totalDragForce = ZERO_VECTOR
 

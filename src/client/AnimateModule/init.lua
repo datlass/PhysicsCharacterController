@@ -779,7 +779,8 @@ local function animate(char, characterController)
     Humanoid.FreeFalling:connect(onFreeFall)
     Humanoid.FallingDown:connect(onFallingDown)
     Humanoid.Seated:connect(onSeated)
-    Humanoid.PlatformStanding:connect(onPlatformStanding)
+    --no more platform stand
+    -- Humanoid.PlatformStanding:connect(onPlatformStanding)
     Humanoid.Swimming:connect(onSwimming)
     --Hook up 
     local stateSignals = characterController._StateSignals
