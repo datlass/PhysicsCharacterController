@@ -43,7 +43,7 @@ function HumanoidOnSeat.new(data : PhysicsCharacterController)
         end)
 
         local debounce = false
-        humanoid.PlatformStanding:Connect(function(active)
+        self._PlatformStanding = humanoid.PlatformStanding:Connect(function(active)
             if active == false and humanoid.SeatPart == nil then
                 local debounceTime = data._Model:GetAttribute("JumpDebounceTime")
                 local Jump = data:GetComponent("Jump")
@@ -66,7 +66,13 @@ end
 
 
 function HumanoidOnSeat:Destroy()
-    
+    if self._SeatedConnection then
+        self._SeatedConnection:Disconnect()
+    end
+    if self._PlatformStanding then
+        self._PlatformStanding:Disconnect()
+    end
+
 end
 
 
