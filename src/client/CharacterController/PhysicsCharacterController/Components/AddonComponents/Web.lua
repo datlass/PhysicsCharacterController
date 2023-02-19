@@ -17,7 +17,7 @@ Web.__index = Web
 function Web.new(data : PhysicsCharacterController)
     local self = setmetatable({}, Web)
     self.Name = "Web"
-    print("Web")
+    print("Web addon initialized")
     self.PhysicsCharacterController = data
     local rootPart = self.PhysicsCharacterController.RootPart
 

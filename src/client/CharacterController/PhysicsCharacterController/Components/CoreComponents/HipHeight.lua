@@ -13,6 +13,7 @@ export type PhysicsCharacterController = {
 }
 
 local ZERO_VECTOR = Vector3.zero
+local HIPHEIGHT_ATTRIBUTE_NAME = "HipHeightIncludingTorso" --Normal hipheight doesn't include the size of the root torso, this controller one does tho
 
 local HipHeight = {}
 HipHeight.__index = HipHeight
@@ -43,26 +44,29 @@ function HipHeight.new(data : PhysicsCharacterController)
     local attachments = {}
     local vectorForces = {}
     self.VectorForces = vectorForces
-    self.Attachments = attachments
+    self._HipheightRaycastAttachments = attachments
     self._vectorSpringDragForce = setupVectorForceRelativeToWorld(data._CenterAttachment, rootPart, true)
     self.OnGround = true
 
+    --Vector force representing the spring forces
+    self._CenterSpringVectorForce = setupVectorForceRelativeToWorld(data._CenterAttachment, rootPart, true)
+
     --0,1,2,3,4,5
+    --Multiple raycasts across rootpart
     for x = 0, divisions  do
         for z = 0, divisions do
             local position = Vector3.new(xDivisionSize*x-topRightCorner.X,0,zDivisionSize*z-topRightCorner.Z)
             local attachment = Instance.new("Attachment")
             attachment.Position = position
             attachment.Parent = rootPart
-            local vectorForce = setupVectorForceRelativeToWorld(attachment, rootPart, true)
             table.insert(attachments, attachment)
-            table.insert(vectorForces, vectorForce)
         end
     end
     local model = data._Model
 
-    model:SetAttribute("Suspension", 1000)
-    model:SetAttribute("Bounce", 25)
+    -- model:SetAttribute("Suspension", 1000) --Not used anymore, now calculated using hipheight and SpringFreeLengthRatio
+    model:SetAttribute("SpringFreeLengthRatio", 1.5)
+    model:SetAttribute("Bounce", 50)
 
     local humanoid = model:FindFirstChild("Humanoid")
     if humanoid then
@@ -79,11 +83,11 @@ function HipHeight:SetupHipHeightForHumanoid(humanoid)
     local model = self.PhysicsCharacterController._Model
 
     if humanoid.RigType == Enum.HumanoidRigType.R6 then
-        hipHeight = model["Left Leg"].Size.Y + rootPart.Size.Y*0.5  + 0.5
+        hipHeight = model["Left Leg"].Size.Y + rootPart.Size.Y*0.5 -- + 0.5
     else
-        hipHeight = humanoid.HipHeight + rootPart.Size.Y*0.5  + 0.5
+        hipHeight = humanoid.HipHeight + rootPart.Size.Y*0.5  --+ 0.5
     end
-    model:SetAttribute("HipHeight", hipHeight)    
+    model:SetAttribute(HIPHEIGHT_ATTRIBUTE_NAME, hipHeight)    
 
     local raycastParams = RaycastParams.new()
     raycastParams.FilterDescendantsInstances = {model}
@@ -91,50 +95,98 @@ function HipHeight:SetupHipHeightForHumanoid(humanoid)
 end
 local DOWN_VECTOR = -Vector3.yAxis
 
-function HipHeight:Update(data : PhysicsCharacterController)
+local function predictVelocity(currentNetForce, mass, currentYVelocity, timeStep : number)
+    local acceleration = currentNetForce/mass --F = ma
+    local addedVelocity = acceleration*timeStep --Integrate acceleration, assuming constant acceleration
+    return currentYVelocity + addedVelocity
+end
+
+local function roundToDecimal(number, decimal)
+    local factor = 10^decimal
+    return math.round(number*factor)/factor
+end
+
+function HipHeight:Update(data : PhysicsCharacterController, dt)
     local rootPart = data.RootPart
     local stateMachine = data._StateMachine
     local model = self.PhysicsCharacterController._Model
-    local hipHeight = model:GetAttribute("HipHeight") or 2.5
-
+    local hipHeight = model:GetAttribute(HIPHEIGHT_ATTRIBUTE_NAME) or 2.5
+    local mass = rootPart.AssemblyMass
     local onGround = false
     local vectorForces = self.VectorForces
-    local totalSuspensionValue = model:GetAttribute("Suspension")
-    
-    local indivudalSuspension = totalSuspensionValue / #vectorForces
+    local hipheightAttachments = self._HipheightRaycastAttachments
+    -- local totalSuspensionValue = model:GetAttribute("Suspension")
 
-    for _, v : VectorForce in pairs(vectorForces) do
-        local attachment = v.Attachment0
-        local raycastResult = workspace:Raycast(attachment.WorldPosition, DOWN_VECTOR*hipHeight, self.RayParams)
+    local totalSpringForce = 0 
+    local freeLengthRatio = model:GetAttribute("SpringFreeLengthRatio") or 1.5
+    local freeLengthOfSpring = hipHeight*freeLengthRatio
+
+    --Calculate equilibrium
+    local weight = mass*workspace.Gravity
+    local ratio = hipHeight*(freeLengthRatio-1)
+    local totalSuspensionValue = weight/ratio
+
+    local maxExtension = 0
+    local signOfExtensionValue = 0
+    local totalNormalVector = Vector3.zero
+    for _, attachment : Attachment in pairs(hipheightAttachments) do
+        local raycastResult = workspace:Raycast(attachment.WorldPosition, DOWN_VECTOR*freeLengthOfSpring, self.RayParams)
         if raycastResult then
     
             local currentSpringLength = (raycastResult.Position - rootPart.Position).Magnitude
             
-            local suspensionForceFactor = rootPart.AssemblyMass*indivudalSuspension
             --Taken from X_O Jeep, a bit too bouncy spring  
             --(hipHeight - currentSpringLength)^2) * (suspensionForceFactor / hipHeight^2)  
             --(suspensionForceFactor / hipHeight^2)
-            local extension = hipHeight - currentSpringLength
+            local extension = freeLengthOfSpring - currentSpringLength
+
+            --take the biggest extension, more extension = more force needed
+            local absExtension = math.abs(extension)
+            if maxExtension < absExtension then
+                maxExtension = absExtension
+                signOfExtensionValue = math.sign(extension)
+            end
             --Currently uses F = k * dx spring, k = spring constant, dx = extension
-            local standupForce = Vector3.new(0, (suspensionForceFactor*(extension)), 0)
-    
-            v.Force = standupForce
-            v.Force += self.MassPerForce*raycastResult.Normal
-            
+            totalNormalVector += raycastResult.Normal
             onGround = true
-        else
-            v.Force = ZERO_VECTOR
         end
+    end
+    local averageNormalVector = totalNormalVector / (#hipheightAttachments)
+
+    local springForce = totalSuspensionValue*(signOfExtensionValue*maxExtension) -- F = -kx spring formula
+    -- springForce = math.min(0, springForce)
+
+    local standupForce = Vector3.yAxis*springForce
+    -- print(springForce, workspace.Gravity*mass)
+    local springVectorForce : VectorForce = self._CenterSpringVectorForce
+    if onGround then
+        springVectorForce.Force = standupForce 
+    else
+        springVectorForce.Force = ZERO_VECTOR
     end
 
     self.OnGround = onGround
     local bounce = model:GetAttribute("Bounce")
-    if onGround then
-        local suspensionForceFactor = rootPart.AssemblyMass*totalSuspensionValue
+    if onGround and stateMachine.current ~= "Jumping" then
+        local suspensionForceFactor = mass*totalSuspensionValue
         --Taken from X_O Jeep, works great
         local damping = suspensionForceFactor/bounce
         -- F = - cV 
-        self._vectorSpringDragForce.Force  = Vector3.new(0,-rootPart.AssemblyLinearVelocity.Y*damping,0)
+        local currentYVelocity = rootPart.AssemblyLinearVelocity.Y
+
+        -- local dragYForce = currentYVelocity*damping
+
+        -- local currentNetForce = dragYForce + totalSpringForce - workspace.Gravity*mass -- + is up, - is down
+
+        -- local velocityPrediction = predictVelocity(currentNetForce, mass, currentYVelocity, dt/2)
+        -- local averageVelocity = (velocityPrediction + currentYVelocity) * 0.5
+        
+        -- local newDragYForce = averageVelocity*damping
+
+        local newDragYForce = currentYVelocity*damping
+
+        -- print(roundToDecimal(currentYVelocity, 2), roundToDecimal(velocityPrediction, 2))
+        self._vectorSpringDragForce.Force  = Vector3.new(0,-newDragYForce,0)
     else
         self._vectorSpringDragForce.Force  = ZERO_VECTOR
     end
@@ -152,7 +204,7 @@ function HipHeight:Destroy()
         v:Destroy()
     end
 
-    for i,v in pairs(self.Attachments) do
+    for i,v in pairs(self._HipheightRaycastAttachments) do
         v:Destroy()
     end
 
