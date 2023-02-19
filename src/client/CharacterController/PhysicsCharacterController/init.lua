@@ -265,6 +265,20 @@ function PhysicsCharacterController:ConnectComponentsToInput()
             end
             ContextActionService:BindAction(componentObject.Name, testFunction, true, table.unpack(componentObject.KeyCodes))
         end
+        
+        if componentObject.UserInputTypes then
+            local testFunction = function(actionName, inputState, inputObject)
+                if inputState == Enum.UserInputState.Begin then
+                    componentObject:InputBegan()
+                end
+                if inputState == Enum.UserInputState.End or inputState == Enum.UserInputState.Cancel then
+                    componentObject:InputEnd()
+                end
+
+                return Enum.ContextActionResult.Sink
+            end
+            ContextActionService:BindAction(componentObject.Name, testFunction, true, table.unpack(componentObject.UserInputTypes))
+        end
 
     end
 end

@@ -51,7 +51,6 @@ function HumanoidOnSeat.new(data : PhysicsCharacterController)
                 humanoid.PlatformStand = true
                 if not debounce then
                     debounce = true
-                    print("Jump")
                     Jump:_RawJump(data, 240)
 
                     task.wait(debounceTime)

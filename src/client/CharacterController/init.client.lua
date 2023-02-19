@@ -20,6 +20,8 @@ local initChar = function(newCharacter : Model)
 	local characterController = PhysicsCharacterController.new(rootPart)
 	characterController:AddCoreComponents()
 	characterController:AddComponent("Slide")
+	characterController:AddComponent("Web")
+
 	-- characterController:AddComponent("AirStrafe") --Component is WIP
 
 	characterController:Run()

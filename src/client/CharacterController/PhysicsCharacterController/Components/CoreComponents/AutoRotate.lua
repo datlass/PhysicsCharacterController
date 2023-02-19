@@ -26,8 +26,13 @@ function AutoRotate.new(PhysicsCharacterController : PhysicsCharacterController)
     local self = setmetatable({}, AutoRotate)
 
     local alignOrientation = Instance.new("AlignOrientation")
+
+
     alignOrientation.Attachment0 = PhysicsCharacterController._CenterAttachment
     PhysicsCharacterController._CenterAttachment.Name = "CenterAttach"
+    alignOrientation.MaxAngularVelocity = 100
+    alignOrientation.Responsiveness = 1000
+    alignOrientation.RigidityEnabled = true
 
     self.AlignOrientation = alignOrientation
 
@@ -39,8 +44,18 @@ function AutoRotate.new(PhysicsCharacterController : PhysicsCharacterController)
 
     self._AlignmentAttachment = alignmentAttachment
 
+    self._Before = CFrame.new()
+    self._After = CFrame.new()
+    self._OverrideCF = nil
+
     return self
 end
+
+local debugPart = Instance.new("Part")
+debugPart.CanCollide = false
+debugPart.CanQuery = false
+debugPart.Anchored = true
+debugPart.Parent = workspace
 
 function AutoRotate:Update(PhysicsCharacterController : PhysicsCharacterController)
     --HumanoidAutoRotate
@@ -49,14 +64,25 @@ function AutoRotate:Update(PhysicsCharacterController : PhysicsCharacterControll
     local moveDirection = PhysicsCharacterController.MoveDirection
     local rootPart = PhysicsCharacterController.RootPart
 
-    if moveDirection.Magnitude > 0 then
-        alignmentAttachment.CFrame = CFrame.lookAt(ZERO_VECTOR, moveDirection)
-    else
-        --Maintain current orientation
-        local _, y, _ = rootPart.CFrame.Rotation:ToOrientation()
-        alignmentAttachment.CFrame = CFrame.fromOrientation(0, y, 0)
-    end
+    if self.getCF then
+        
+        alignmentAttachment.CFrame = self.getCF()*alignmentAttachment.CFrame
 
+    else
+
+        if moveDirection.Magnitude > 0 then
+            alignmentAttachment.CFrame = CFrame.lookAt(ZERO_VECTOR, moveDirection)
+        else
+            --Maintain current orientation
+            local _, y, _ = rootPart.CFrame.Rotation:ToOrientation()
+            alignmentAttachment.CFrame = CFrame.fromOrientation(0, y, 0)
+        end
+
+    end
+    
+    alignmentAttachment.CFrame = self._Before*alignmentAttachment.CFrame*self._After
+
+    -- debugPart.CFrame = alignmentAttachment.CFrame.Rotation + rootPart.CFrame.Position + Vector3.new(0,5,0)
 end
 
 function AutoRotate:Destroy()
@@ -66,6 +92,5 @@ function AutoRotate:Destroy()
     self.AlignOrientation:Destroy()
     
 end
-
 
 return AutoRotate
