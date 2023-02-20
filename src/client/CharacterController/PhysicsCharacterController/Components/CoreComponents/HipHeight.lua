@@ -229,13 +229,10 @@ function HipHeight:Update(data : PhysicsCharacterController, dt)
         local predictedVelocity = predictVelocity(newNetForce, mass, predictedVelocity, substepTimeIncrement)
         local predictedDisplacement = predictDisplacement(newNetForce, mass, predictedDisplacement, substepTimeIncrement)
         local newExtension = extension + predictedDisplacement
-
-        local springLength = freeLengthOfSpring - extension
-
         local predictedDrag = -predictedVelocity*damping
 
         local predictedSpringForce
-        local predictedNewSpringLength = springLength + predictedDisplacement
+        local predictedNewSpringLength = predictedNewSpringLength + predictedDisplacement
         if predictedNewSpringLength > hipHeight then
             predictedSpringForce = 0
         else
