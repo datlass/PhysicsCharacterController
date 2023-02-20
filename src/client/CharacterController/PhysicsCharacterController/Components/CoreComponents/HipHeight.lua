@@ -46,7 +46,7 @@ function HipHeight.new(data : PhysicsCharacterController)
     self.VectorForces = vectorForces
     self._HipheightRaycastAttachments = attachments
     self._vectorSpringDragForce = setupVectorForceRelativeToWorld(data._CenterAttachment, rootPart, true)
-    self.OnGround = true
+    self.OnGround = true --Readable property
 
     --Vector force representing the spring forces
     self._CenterSpringVectorForce = setupVectorForceRelativeToWorld(data._CenterAttachment, rootPart, true)
@@ -66,7 +66,7 @@ function HipHeight.new(data : PhysicsCharacterController)
 
     -- model:SetAttribute("Suspension", 1000) --Not used anymore, now calculated using hipheight and SpringFreeLengthRatio
     model:SetAttribute("SpringFreeLengthRatio", 1.5)
-    model:SetAttribute("Bounce", 50)
+    model:SetAttribute("Bounce", 3)
 
     local humanoid = model:FindFirstChild("Humanoid")
     if humanoid then
@@ -98,7 +98,12 @@ local DOWN_VECTOR = -Vector3.yAxis
 local function predictVelocity(currentNetForce, mass, currentYVelocity, timeStep : number)
     local acceleration = currentNetForce/mass --F = ma
     local addedVelocity = acceleration*timeStep --Integrate acceleration, assuming constant acceleration
-    return currentYVelocity + addedVelocity
+    return currentYVelocity + addedVelocity , addedVelocity
+end
+
+local function predictDisplacement(currentNetForce, mass, currentYVelocity, timeStep)
+    local acceleration = currentNetForce/mass --F = ma
+    return currentYVelocity*timeStep + 0.5*acceleration*timeStep^2
 end
 
 local function roundToDecimal(number, decimal)
@@ -106,31 +111,14 @@ local function roundToDecimal(number, decimal)
     return math.round(number*factor)/factor
 end
 
-function HipHeight:Update(data : PhysicsCharacterController, dt)
-    local rootPart = data.RootPart
-    local stateMachine = data._StateMachine
-    local model = self.PhysicsCharacterController._Model
-    local hipHeight = model:GetAttribute(HIPHEIGHT_ATTRIBUTE_NAME) or 2.5
-    local mass = rootPart.AssemblyMass
+local function calculateSpringState(hipheightAttachments, freeLengthOfSpring, rayParams, rootPart)
     local onGround = false
-    local vectorForces = self.VectorForces
-    local hipheightAttachments = self._HipheightRaycastAttachments
-    -- local totalSuspensionValue = model:GetAttribute("Suspension")
-
-    local totalSpringForce = 0 
-    local freeLengthRatio = model:GetAttribute("SpringFreeLengthRatio") or 1.5
-    local freeLengthOfSpring = hipHeight*freeLengthRatio
-
-    --Calculate equilibrium
-    local weight = mass*workspace.Gravity
-    local ratio = hipHeight*(freeLengthRatio-1)
-    local totalSuspensionValue = weight/ratio
 
     local maxExtension = 0
     local signOfExtensionValue = 0
     local totalNormalVector = Vector3.zero
     for _, attachment : Attachment in pairs(hipheightAttachments) do
-        local raycastResult = workspace:Raycast(attachment.WorldPosition, DOWN_VECTOR*freeLengthOfSpring, self.RayParams)
+        local raycastResult = workspace:Raycast(attachment.WorldPosition, DOWN_VECTOR*freeLengthOfSpring, rayParams)
         if raycastResult then
     
             local currentSpringLength = (raycastResult.Position - rootPart.Position).Magnitude
@@ -153,42 +141,116 @@ function HipHeight:Update(data : PhysicsCharacterController, dt)
     end
     local averageNormalVector = totalNormalVector / (#hipheightAttachments)
 
-    local springForce = totalSuspensionValue*(signOfExtensionValue*maxExtension) -- F = -kx spring formula
-    -- springForce = math.min(0, springForce)
+    local extension = maxExtension*signOfExtensionValue
 
-    local standupForce = Vector3.yAxis*springForce
-    -- print(springForce, workspace.Gravity*mass)
-    local springVectorForce : VectorForce = self._CenterSpringVectorForce
-    if onGround then
-        springVectorForce.Force = standupForce 
-    else
-        springVectorForce.Force = ZERO_VECTOR
-    end
+    return extension, averageNormalVector, onGround
+end
 
+function HipHeight:Update(data : PhysicsCharacterController, dt)
+    local rootPart = data.RootPart
+    local stateMachine = data._StateMachine
+    local model = self.PhysicsCharacterController._Model
+    local hipHeight = model:GetAttribute(HIPHEIGHT_ATTRIBUTE_NAME) or 2.5
+    local mass = rootPart.AssemblyMass
+    local hipheightAttachments = self._HipheightRaycastAttachments
+
+    local freeLengthRatio = model:GetAttribute("SpringFreeLengthRatio") or 1.5 --Length of the raycast spring, compared to the hipheight
+    local freeLengthOfSpring = hipHeight*freeLengthRatio
+
+    --Calculate spring constant, for given hipheight against gravity, from equilibrium
+    local weight = mass*workspace.Gravity
+    local ratio = hipHeight*(freeLengthRatio-1)
+    local totalSuspensionValue = weight/ratio
+
+    local extension, averageNormalVector, onGround = calculateSpringState(hipheightAttachments, freeLengthOfSpring, self.RayParams, rootPart)
     self.OnGround = onGround
+    -- print(extension, hipHeight, freeLengthOfSpring)
+    -- print(freeLengthOfSpring - extension) --equals hipheight
+
+    local springVectorForce : VectorForce = self._CenterSpringVectorForce
+    local dragVectorForce = self._vectorSpringDragForce
+
     local bounce = model:GetAttribute("Bounce")
+
+    --Disable hipheight spring when jumping, or else spring forces will assist in the players jump
     if onGround and stateMachine.current ~= "Jumping" then
-        local suspensionForceFactor = mass*totalSuspensionValue
+        --Calculate initial spring force
+        local springForce = totalSuspensionValue*(extension) -- F = -kx spring formula
+        -- springForce = math.clamp(springForce, 0, weight*1.1) --works a bit but not completely, also causes legs to sink into the ground due to no upward force
+    
+        local standupForce = Vector3.yAxis*springForce
+    
+        local netForce = springForce - weight
+    
+        springVectorForce.Force = standupForce
+
         --Taken from X_O Jeep, works great
-        local damping = suspensionForceFactor/bounce
+        local damping = totalSuspensionValue/bounce
         -- F = - cV 
         local currentYVelocity = rootPart.AssemblyLinearVelocity.Y
 
-        -- local dragYForce = currentYVelocity*damping
-
-        -- local currentNetForce = dragYForce + totalSpringForce - workspace.Gravity*mass -- + is up, - is down
-
-        -- local velocityPrediction = predictVelocity(currentNetForce, mass, currentYVelocity, dt/2)
-        -- local averageVelocity = (velocityPrediction + currentYVelocity) * 0.5
+        local newDragYForce = -currentYVelocity*damping
         
-        -- local newDragYForce = averageVelocity*damping
-
-        local newDragYForce = currentYVelocity*damping
+        netForce += newDragYForce
 
         -- print(roundToDecimal(currentYVelocity, 2), roundToDecimal(velocityPrediction, 2))
-        self._vectorSpringDragForce.Force  = Vector3.new(0,-newDragYForce,0)
+        dragVectorForce.Force  = Vector3.new(0,newDragYForce,0)
+
+        local substepDivisions = 5 --Smaller the time increments the better it seems, probably due to integration overshoot
+        local substepTimeIncrement = dt/substepDivisions
+        --Perform substep
+        local predictedVelocity = predictVelocity(netForce, mass, currentYVelocity, substepTimeIncrement)
+        local predictedDisplacement = predictDisplacement(netForce, mass, currentYVelocity, substepTimeIncrement)
+        local newExtension = extension + predictedDisplacement
+
+        local springLength = freeLengthOfSpring - extension
+
+        local predictedDrag = -predictedVelocity*damping
+
+        
+        local predictedSpringForce
+        local predictedNewSpringLength = springLength + predictedDisplacement
+        if predictedNewSpringLength > hipHeight then
+            predictedSpringForce = 0
+        else
+            predictedSpringForce = totalSuspensionValue*(newExtension)
+        end
+
+        local averageDrag = (predictedDrag + newDragYForce) * 0.5
+        local averageSpringForce = (predictedSpringForce + springForce) * 0.5
+
+        self._vectorSpringDragForce.Force = Vector3.new(0,averageDrag,0)
+        springVectorForce.Force = Vector3.new(0,averageSpringForce,0)
+
+        --Perform another substep experimental, probably should clean it up into a function
+        --Continues from the previous substep
+        local newNetForce = averageDrag + averageSpringForce - weight
+
+        local predictedVelocity = predictVelocity(newNetForce, mass, predictedVelocity, substepTimeIncrement)
+        local predictedDisplacement = predictDisplacement(newNetForce, mass, predictedDisplacement, substepTimeIncrement)
+        local newExtension = extension + predictedDisplacement
+
+        local springLength = freeLengthOfSpring - extension
+
+        local predictedDrag = -predictedVelocity*damping
+
+        local predictedSpringForce
+        local predictedNewSpringLength = springLength + predictedDisplacement
+        if predictedNewSpringLength > hipHeight then
+            predictedSpringForce = 0
+        else
+            predictedSpringForce = totalSuspensionValue*(newExtension)
+        end
+
+        local averageDrag = (predictedDrag + averageDrag) * 0.5
+        local averageSpringForce = (predictedSpringForce + averageSpringForce) * 0.5
+
+        self._vectorSpringDragForce.Force = Vector3.new(0,averageDrag,0)
+        springVectorForce.Force = Vector3.new(0,averageSpringForce,0)
     else
         self._vectorSpringDragForce.Force  = ZERO_VECTOR
+        springVectorForce.Force = ZERO_VECTOR
+
     end
 
     if onGround and stateMachine.current == "FreeFalling" then

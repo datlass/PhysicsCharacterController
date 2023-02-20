@@ -24,6 +24,7 @@ function Slide.new(data : PhysicsCharacterController)
     self._SlideDebounce = false
 
     self.SlideAnimTransitionTime = 0
+    model:SetAttribute("SlidePower", 3000)
 
     self.KeyCodes = {Enum.KeyCode.F}
 
@@ -58,7 +59,7 @@ function Slide:InputBegan()
         model:SetAttribute("WalkSpeed", 0)
 
         -- model:SetAttribute("Suspension", 26000)
-        model:SetAttribute("Bounce", 50) --Reduce drag allowing velocity to go upwards
+        -- model:SetAttribute("Bounce", 50) --Reduce drag allowing velocity to go upwards
         model:SetAttribute("FlatFriction", 2500) --Increase friction for faster accel but less distance
 
         -- local waist = model:FindFirstChild("Root", true)
@@ -72,7 +73,7 @@ function Slide:InputBegan()
 		-- self._OriginalAlignMaxTorque = alignOrientation.MaxTorque
         -- alignOrientation.MaxTorque = 0
         
-        rootPart:ApplyImpulse(rootPart.CFrame.LookVector*2000)
+        rootPart:ApplyImpulse(rootPart.CFrame.LookVector*model:GetAttribute("SlidePower"))
 		task.wait(0.2)
 		self._SlideDebounce = false
 	end
@@ -90,7 +91,7 @@ function Slide:InputEnd()
     end
     -- model:SetAttribute("Suspension", 21000)
     --Reset back to original
-    model:SetAttribute("Bounce", 25)
+    -- model:SetAttribute("Bounce", 25)
     model:SetAttribute("FlatFriction", 500) --Increase friction for faster accel but less distance
 
     -- local waist = model:FindFirstChild("Root", true)

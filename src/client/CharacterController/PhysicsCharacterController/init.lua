@@ -73,6 +73,17 @@ export type PhysicsCharacterController = {
     MoveDirection : Vector3
 }
 
+local function setPartFriction(part, friction, frictionWeight)
+	local partProperties = part.CustomPhysicalProperties or PhysicalProperties.new(part.Material)
+	local a, b, c, d, e =
+		partProperties.Density, partProperties.Friction, partProperties.Elasticity, partProperties.FrictionWeight, partProperties.ElasticityWeight
+
+        b = friction
+        d = frictionWeight
+	part.CustomPhysicalProperties = PhysicalProperties.new(a, b, c, d, e)
+end
+
+
 local PhysicsCharacterController : PhysicsCharacterController = {}
 PhysicsCharacterController.__index = PhysicsCharacterController
 
@@ -82,6 +93,14 @@ function PhysicsCharacterController.new(rootPart : BasePart, humanoid : Humanoid
     local model = rootPart:FindFirstAncestorOfClass("Model")
     assert(model, "Rootpart should have a model")
     self._Model = model
+
+    local descendants = model:GetDescendants()
+    for i, v : BasePart in pairs(descendants) do
+        if v:IsA("BasePart") then
+            setPartFriction(v, 0, 9999999)
+        end
+    end
+    --Doesn't do much for sliding
 
     self.RootPart = rootPart
     
