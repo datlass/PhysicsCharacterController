@@ -1,5 +1,6 @@
 --[[
     Handles vectorforces to keep the rootPart standing
+    Ignore, this fail module attempts to use align position, but align position controls all axis and cannot be used for y axis only :((
 ]]
 
 export type PhysicsCharacterController = {
@@ -51,6 +52,18 @@ function HipHeight.new(data : PhysicsCharacterController)
     --Vector force representing the spring forces
     self._CenterSpringVectorForce = setupVectorForceRelativeToWorld(data._CenterAttachment, rootPart, true)
 
+    local alignAttach = Instance.new("Attachment")
+    alignAttach.Position = data._CenterAttachment.WorldPosition
+    alignAttach.Parent = workspace.Terrain
+
+    local alignPosition = Instance.new("AlignPosition")
+    alignPosition.RigidityEnabled = false
+    alignPosition.Attachment0 = data._CenterAttachment
+    alignPosition.Attachment1 = alignAttach
+    alignPosition.Parent = workspace
+
+    self._AlignPosition = alignPosition
+    self._AlignAttach1 = alignAttach
     --0,1,2,3,4,5
     --Multiple raycasts across rootpart
     for x = 0, divisions  do
@@ -119,14 +132,9 @@ local function calculateSpringState(hipheightAttachments, freeLengthOfSpring, ra
     local signOfExtensionValue = 0
     local totalNormalVector = Vector3.zero
     local GlobalRaycastResult
-    local averageHitPosition = Vector3.zero
-    local i = 0
     for _, attachment : Attachment in pairs(hipheightAttachments) do
         local raycastResult = workspace:Raycast(attachment.WorldPosition, DOWN_VECTOR*freeLengthOfSpring, rayParams)
         if raycastResult then
-            averageHitPosition += raycastResult.Position
-            i += 1
-
             local currentSpringLength = (raycastResult.Position - rootPart.Position).Magnitude
             
             --Taken from X_O Jeep, a bit too bouncy spring  
@@ -152,7 +160,7 @@ local function calculateSpringState(hipheightAttachments, freeLengthOfSpring, ra
 
     local extension = maxExtension*signOfExtensionValue
 
-    return extension, averageNormalVector, onGround, minimumSpringLength, GlobalRaycastResult, averageHitPosition/i
+    return extension, averageNormalVector, onGround, minimumSpringLength, GlobalRaycastResult
 end
 
 --Luanoid method of hipheight, works great and rigid however cannot solve for overshoot, ends up bouncy
@@ -160,8 +168,6 @@ local function calculateForces(targetHeight, currentHeight, currentYVelocity, t,
     -- counter gravity and then solve constant acceleration eq
     -- (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
     local aUp = workspace.Gravity + 2*((targetHeight - currentHeight) - currentYVelocity*t)/(t*t)
-
-    --Below is not needed anymore, using physics substepping algorithm we can achieve similar results to 240 Hz
 
     -- Don't go past a maxmium velocity or we'll overshoot our target height.
     -- Calculate the intitial velocity that under constant acceleration would crest at the target height.
@@ -175,8 +181,7 @@ local function calculateForces(targetHeight, currentHeight, currentYVelocity, t,
     -- -- step rate internally, not always the right thing for us here. Having to deal with not having a proper step event...
     --  local maxUpImpulse = math.max((maxUpVelocity - currentYVelocity)*60/dt, 0)
     -- aUp = math.min(aUp, maxUpImpulse)
-
-    aUp = math.max(-1, aUp) --Limit downward force
+    aUp = math.max(-1, aUp)
 
     return aUp*mass
 end
@@ -196,7 +201,7 @@ function HipHeight:Update(data : PhysicsCharacterController, dt)
     local ratio = hipHeight*(freeLengthRatio-1)
     local totalSuspensionValue = weight/ratio
 
-    local extension, averageNormalVector, onGround, minimumSpringLength, GlobalRaycastResult, averageHitPosition = calculateSpringState(hipheightAttachments, freeLengthOfSpring, self.RayParams, rootPart)
+    local extension, averageNormalVector, onGround, minimumSpringLength, GlobalRaycastResult = calculateSpringState(hipheightAttachments, freeLengthOfSpring, self.RayParams, rootPart)
     self.OnGround = onGround
     -- print(extension, hipHeight, freeLengthOfSpring)
 
@@ -205,47 +210,30 @@ function HipHeight:Update(data : PhysicsCharacterController, dt)
 
     local bounce = model:GetAttribute("Bounce")
 
+    local alignPosition : AlignPosition = self._AlignPosition
+    local alignAttach : Attachment = self._AlignAttach1
+    local rootPartPosition = rootPart.Position
+
+    alignAttach.Position = rootPartPosition
+
     --Disable hipheight spring when jumping, or else spring forces will assist in the players jump
     if onGround and stateMachine.current ~= "Jumping" then
         --Calculate initial spring force
-        local targetHeight = averageHitPosition.Y + hipHeight
+        local targetHeight = GlobalRaycastResult.Position.Y + hipHeight
 
         local currentYVelocity = rootPart.AssemblyLinearVelocity.Y
-        local currentHeight = rootPart.Position.Y
+        local rootPartPosition = rootPart.Position
+        local currentHeight = rootPartPosition.Y
 		local t = 0.05
 
-        local upwardForce = calculateForces(targetHeight, currentHeight, currentYVelocity, t, mass, hipHeight, dt)
+        -- self._AlignPosition = alignPosition
+        alignPosition.Enabled = true
 
-        local function physicsSubstep(substepUpwardForce, step, substepYVelocity, iterateHeight)
-            local netForce = substepUpwardForce  - weight
-
-            local predictedVelocity = predictVelocity(netForce, mass, substepYVelocity, step)
-            local predictedDisplacement = predictDisplacement(netForce, mass, substepYVelocity, step)
-
-            local newUpwardForce = calculateForces(targetHeight, iterateHeight+predictedDisplacement, predictedVelocity, t, mass, hipHeight, dt)
-            local averageVelocity = (substepYVelocity+predictedVelocity) * 0.5
-            local averageForce = (newUpwardForce+ substepUpwardForce)*0.5
-            local averageHeight = iterateHeight+predictedDisplacement*0.5
-
-            return averageForce, averageVelocity, averageHeight
-        end
-
-        --Perform physics substep
-        local iterateForce = upwardForce
-        local iterateYVelocity = currentYVelocity
-        local iterateHeight = currentHeight
-        local n = 3
-        local step = dt/n
-        for _ = 1, n-1 do
-            iterateForce, iterateYVelocity, iterateHeight = physicsSubstep(iterateForce, step, iterateYVelocity, iterateHeight)
-        end
-        upwardForce = iterateForce
-
-        springVectorForce.Force = Vector3.new(0,upwardForce,0)
+        -- springVectorForce.Force = Vector3.new(0,upwardForce,0)
     else
         self._vectorSpringDragForce.Force  = ZERO_VECTOR
         springVectorForce.Force = ZERO_VECTOR
-
+        alignPosition.Enabled = false
     end
 
     if onGround and stateMachine.current == "FreeFalling" then
